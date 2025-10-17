@@ -1,0 +1,16 @@
+- name: Install NTFS support
+  apt:
+    name: ntfs-3g
+
+- name: Create mount point
+  file:
+    path: /ntfs931
+    state: directory
+
+- name: Add NTFS drive to fstab
+  mount:
+    path: /ntfs931
+    src: UUID=84603D87603D814A
+    fstype: ntfs-3g
+    opts: defaults,remove_hiberfile,nofail
+    state: mounted

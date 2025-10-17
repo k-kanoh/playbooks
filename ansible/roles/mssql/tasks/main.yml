@@ -1,0 +1,15 @@
+- name: Create data directory
+  file:
+    path: /storage/mssql/data
+    state: directory
+    owner: "10001"
+
+- name: Transfer docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /app/mssql/
+
+- name: Start containers
+  shell: docker compose up -d
+  args:
+    chdir: /app/mssql

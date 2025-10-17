@@ -1,0 +1,47 @@
+- name: Install GPG Key for Elastic
+  shell: wget -O- https://artifacts.elastic.co/GPG-KEY-elasticsearch | gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/elasticsearch-keyring.gpg
+
+- name: Add Elastic Repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main"
+
+- name: Install required packages
+  apt:
+    name: 
+      - default-jre
+      - elasticsearch
+      - kibana
+
+- name: Disable xpack security in elasticsearch.yml
+  lineinfile:
+    path: /etc/elasticsearch/elasticsearch.yml
+    regexp: '^xpack.security.enabled:'
+    line: 'xpack.security.enabled: false'
+
+- name: Configure Kibana settings
+  lineinfile:
+    path: /etc/kibana/kibana.yml
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^#server.host:', line: 'server.host: "0.0.0.0"' }
+    - { regexp: '^#i18n.locale:', line: 'i18n.locale: "ja-JP"' }
+
+- name: Install Elasticsearch plugins
+  shell: /usr/share/elasticsearch/bin/elasticsearch-plugin install {{ item }}
+  loop:
+    - analysis-kuromoji
+    - analysis-icu
+  args:
+    creates: /usr/share/elasticsearch/plugins/{{ item }}
+
+- name: Enable and restart services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  loop:
+    - elasticsearch
+    - kibana
