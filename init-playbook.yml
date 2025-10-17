@@ -1,0 +1,60 @@
+- name: vagrant provisioning
+  hosts: localhost # all / localhost
+  become: yes
+  tasks:
+    - name: timezoneを設定
+      timezone:
+        name: Asia/Tokyo
+
+    - name: 電源ボタンを無効化
+      lineinfile:
+        path: /etc/systemd/logind.conf
+        regexp: '^#?HandlePowerKey='
+        line: 'HandlePowerKey=ignore'
+
+    - name: systemd-logindを再起動
+      systemd:
+        name: systemd-logind
+        state: restarted
+
+    - name: ユーザを追加
+      user:
+        uid: 9066
+        name: kkano
+        shell: /bin/bash
+
+    - name: 公開鍵の登録
+      authorized_key:
+        user: kkano
+        key: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAvXcUTwuez+UlS7cglAviBPWlBekEyLtsr39DYKjY5hnoUlBbRaCEEeZERGdQ3/JcISU1z4g7mPMeEcUhfgXT6CO1EOhvGDIB+RaKA1O8/67nEvIy8G52giK5t2rjU+MX+WO6U5X+Lsbkbqc/E9YeFSRYBN8EzrcDwPi8hgpRmFJzdMAskye16+kV/y45qJJD+mIwk33JK2MNI5nCixl/Pc1+kZInZaqL6yQYDImoctMe7CLAMQf4qbfgXGrnQmY3HzqbhefLrvRp9C8oHn5kJdbAP1pkWAtqOKF0oyh49QhkDqwckDrEYoLkgOC2Lhrb8Gdj04nRgRiOr53uEEW4Ww=="
+
+    - name: ユーザをsudoersに登録
+      copy:
+        content: "kkano ALL=(ALL) NOPASSWD: ALL"
+        dest: /etc/sudoers.d/kkano
+        mode: 0440
+
+    - name: .gitconfigを作成
+      copy:
+        dest: /home/kkano/.gitconfig
+        owner: kkano
+        group: kkano
+        content: |
+          [core]
+            editor = vim
+            quotepath = false
+          [color]
+            ui = auto
+          [user]
+            name = Kenichi KANOH
+            email = k.kanoh@cixi.sakura.ne.jp
+          [pull]
+            ff = only
+          [rebase]
+            autosquash = true
+          [alias]
+            pushf = push --force
+            ncommit = commit --allow-empty-message -m \"\"
+            rabo = rebase --abort
+            rcon = rebase --continue
+            rsame = rebase --committer-date-is-author-date

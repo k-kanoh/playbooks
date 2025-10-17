@@ -1,0 +1,5 @@
+- name: Install development packages
+  apt:
+    name:
+      - make
+      - php-cli
