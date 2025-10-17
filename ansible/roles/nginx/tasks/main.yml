@@ -1,0 +1,36 @@
+- name: Install nginx
+  apt:
+    name: nginx
+
+- name: Copy SSL certificate
+  copy:
+    src: files/daieihawks.crt
+    dest: /etc/ssl/certs/daieihawks.crt
+
+- name: Copy SSL private key
+  copy:
+    src: files/daieihawks.key
+    dest: /etc/ssl/private/daieihawks.key
+    mode: "0600"
+
+- name: Copy nginx configuration
+  copy:
+    src: files/daieihawks
+    dest: /etc/nginx/sites-available/daieihawks
+
+- name: Enable site
+  file:
+    src: /etc/nginx/sites-available/daieihawks
+    dest: /etc/nginx/sites-enabled/daieihawks
+    state: link
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Enable and restart service
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: yes

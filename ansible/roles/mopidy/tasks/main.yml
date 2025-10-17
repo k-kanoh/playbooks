@@ -1,0 +1,44 @@
+- name: Install dependencies
+  apt:
+    name:
+      - gnupg2
+      - python3-pip
+      - alsa-utils
+
+- name: Download and add Mopidy GPG key
+  shell: curl -fsSL https://apt.mopidy.com/mopidy.gpg | gpg --dearmor -o /usr/share/keyrings/mopidy-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/mopidy-archive-keyring.gpg
+
+- name: Add Mopidy repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/mopidy-archive-keyring.gpg] https://apt.mopidy.com/ bullseye main"
+
+- name: Install Mopidy
+  apt:
+    name:
+      - mopidy
+      - mopidy-mpd
+
+- name: Install Mopidy extensions via pip
+  pip:
+    name:
+      - Mopidy-Iris
+      - Mopidy-TuneIn
+    extra_args: --break-system-packages
+
+- name: Configure ALSA with dmix for multi-application audio
+  copy:
+    src: asound.conf
+    dest: /etc/asound.conf
+
+- name: Configure Mopidy
+  copy:
+    src: mopidy.conf
+    dest: /etc/mopidy/mopidy.conf
+
+- name: Enable and restart service
+  systemd:
+    name: mopidy
+    state: restarted
+    enabled: yes

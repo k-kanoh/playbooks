@@ -1,0 +1,15 @@
+- name: Install netdata dependencies
+  apt:
+    name:
+      - lm-sensors
+
+- name: Install netdata
+  shell: bash <(curl -SsL https://my-netdata.io/kickstart.sh)
+  args:
+    executable: /bin/bash
+
+- name: Ensure netdata is running
+  service:
+    name: netdata
+    state: started
+    enabled: yes

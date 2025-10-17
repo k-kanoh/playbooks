@@ -1,0 +1,2 @@
+CREATE DATABASE redmine;
+CREATE DATABASE gitea;

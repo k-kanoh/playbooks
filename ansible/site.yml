@@ -1,0 +1,22 @@
+- hosts: localhost
+  tasks:
+    - name: 実行確認
+      pause:
+        prompt: "site.ymlを実行しますか？ (yes/no)"
+      register: confirm
+
+    - name: 実行をキャンセル
+      fail:
+        msg: "実行がキャンセルされました"
+      when: confirm.user_input != "yes"
+
+- hosts: localhost
+  become: yes
+  roles:
+    - samba
+    - docker
+    - nginx
+    - mopidy
+    - netdata
+    - dev-tools
+    - redmine

@@ -1,0 +1,7 @@
+- name: Install development packages
+  apt:
+    name:
+      - make
+      - php-cli
+      - python3-venv
+      - pipx

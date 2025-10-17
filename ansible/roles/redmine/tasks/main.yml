@@ -1,0 +1,45 @@
+- name: Transfer configuration files
+  copy:
+    src: files/
+    dest: /app/docker-redmine-gitea
+
+- name: Generate and create .env file
+  shell: echo "SECRET_KEY_BASE=$(openssl rand -hex 64)" > /app/docker-redmine-gitea/.env
+
+- name: Clone redmine_theme_farend_fancy
+  git:
+    repo: https://github.com/farend/redmine_theme_farend_fancy.git
+    dest: /app/docker-redmine-gitea/redmine/themes/farend_fancy
+
+- name: Start containers
+  shell: docker compose up -d
+  args:
+    chdir: /app/docker-redmine-gitea
+
+- name: Wait for Redmine to be ready
+  uri:
+    url: http://localhost:3000
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 30
+  delay: 2
+
+- name: Clone redmine-view-customize plugin
+  git:
+    repo: https://github.com/onozaty/redmine-view-customize.git
+    dest: /app/docker-redmine-gitea/redmine/plugins/view_customize
+
+- name: Install redmine-view-customize
+  shell: |
+    docker compose exec -T redmine bash -c '
+      bundle config set --local without "development test" &&
+      bundle install &&
+      bundle exec rake redmine:plugins:migrate RAILS_ENV=production'
+  args:
+    chdir: /app/docker-redmine-gitea
+
+- name: Restart Redmine container
+  shell: docker compose restart redmine
+  args:
+    chdir: /app/docker-redmine-gitea
