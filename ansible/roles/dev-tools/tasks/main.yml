@@ -1,0 +1,11 @@
+- name: Install development packages
+  apt:
+    name:
+      - jq
+      - make
+      - php-cli
+      - zip
+      - unzip
+      - python3-pip
+      - pipx
+      - sqlite3

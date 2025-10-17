@@ -1,0 +1,61 @@
+services:
+  postgresql:
+    image: postgres:18
+    container_name: postgresql
+    environment:
+      POSTGRES_PASSWORD: passw0rd
+      POSTGRES_USER: admin
+      TZ: Asia/Tokyo
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale-provider=icu --icu-locale=ja-JP"
+    volumes:
+      - ./postgresql/init:/docker-entrypoint-initdb.d
+      - ./postgresql/data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redmine:
+    image: redmine:5
+    container_name: redmine
+    environment:
+      REDMINE_DB_POSTGRES: postgresql
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_USERNAME: admin
+      REDMINE_DB_PASSWORD: passw0rd
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      TZ: Asia/Tokyo
+    volumes:
+      - ./redmine/config/configuration.yml:/usr/src/redmine/config/configuration.yml
+      - ./redmine/plugins:/usr/src/redmine/plugins
+      - ./redmine/themes:/usr/src/redmine/public/themes
+      - ./redmine/files:/usr/src/redmine/files
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgresql
+    restart: unless-stopped
+
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    environment:
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=postgresql
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=admin
+      - GITEA__database__PASSWD=passw0rd
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./gitea/data:/data
+    ports:
+      - "3001:3000"
+    depends_on:
+      - postgresql
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    ports:
+      - "8025:8025"
+    restart: unless-stopped

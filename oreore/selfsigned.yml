@@ -1,0 +1,33 @@
+- hosts: localhost
+  tasks:
+    - name: 秘密鍵を作成
+      openssl_privatekey:
+        path: daieihawks.key
+
+    - name: 証明書要求の作成
+      openssl_csr:
+        path: oreore.csr
+        privatekey_path: daieihawks.key
+        common_name: daieihawks
+        country_name: JP
+        state_or_province_name: Osaka
+        locality_name: Namba
+        subject_alt_name:
+          - DNS:daieihawks
+          - DNS:redmine.daieihawks
+          - DNS:gitea.daieihawks
+          - DNS:mopidy.daieihawks
+          - DNS:netdata.daieihawks
+          - IP:192.168.0.99
+
+    - name: 証明書を自己署名
+      openssl_certificate:
+        path: daieihawks.crt
+        privatekey_path: daieihawks.key
+        csr_path: oreore.csr
+        provider: selfsigned
+
+    - name: csrファイルを削除
+      file:
+        path: oreore.csr
+        state: absent
