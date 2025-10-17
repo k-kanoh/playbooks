@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+branch="$1"
+shift
+
+target=$(git branch --show-current)
+if [ -z "$target" ]; then
+    target=$(basename "$(cat "$(git rev-parse --git-dir)/rebase-merge/head-name")")
+fi
+
+message="Merge branch '$branch' into $target"
+
+if git merge --squash --ff "$branch"; then
+    git commit -m "$message" "$@"
+else
+    echo "$message" > "$(git rev-parse --git-path SQUASH_MSG)"
+    exit 1
+fi

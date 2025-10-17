@@ -1,0 +1,14 @@
+- name: Sambaのインストール
+  apt:
+    name: samba
+
+- name: smb.confを転送
+  copy:
+    src: smb.conf
+    dest: /etc/samba/
+
+- name: Enable and restart service
+  systemd:
+    name: smbd
+    state: restarted
+    enabled: yes

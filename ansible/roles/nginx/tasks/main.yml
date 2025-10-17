@@ -1,0 +1,44 @@
+- name: Install nginx
+  apt:
+    name: nginx
+
+- name: Copy SSL certificate
+  copy:
+    src: files/daieihawks.crt
+    dest: /etc/ssl/certs/daieihawks.crt
+
+- name: Copy SSL private key
+  copy:
+    src: files/daieihawks.key
+    dest: /etc/ssl/private/daieihawks.key
+    mode: '0600'
+
+- name: Copy daieihawks snippet
+  copy:
+    src: snippets/daieihawks.conf
+    dest: /etc/nginx/snippets/daieihawks.conf
+
+- name: Copy vhosts to sites-available
+  copy:
+    src: "sites-available/{{ item }}"
+    dest: "/etc/nginx/sites-available/{{ item }}"
+  loop: &vhosts
+    - daieihawks
+    - redmine.daieihawks
+    - gitea.daieihawks
+    - mopidy.daieihawks
+    - netdata.daieihawks
+    - memdump.daieihawks
+
+- name: Enable vhosts in sites-enabled
+  file:
+    src: "/etc/nginx/sites-available/{{ item }}"
+    dest: "/etc/nginx/sites-enabled/{{ item }}"
+    state: link
+  loop: *vhosts
+
+- name: Enable and restart service
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: yes

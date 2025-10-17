@@ -1,0 +1,9 @@
+server {
+    listen 443 ssl;
+    server_name gitea.daieihawks;
+    include /etc/nginx/snippets/daieihawks.conf;
+
+    location / {
+        proxy_pass http://localhost:3001;
+    }
+}
