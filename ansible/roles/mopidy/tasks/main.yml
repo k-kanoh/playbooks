@@ -12,7 +12,7 @@
 
 - name: Add Mopidy repository
   apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/mopidy-archive-keyring.gpg] https://apt.mopidy.com/ bullseye main"
+    repo: "deb [signed-by=/usr/share/keyrings/mopidy-archive-keyring.gpg] https://apt.mopidy.com/ bookworm main"
 
 - name: Install Mopidy
   apt:

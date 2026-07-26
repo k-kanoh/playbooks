@@ -46,7 +46,8 @@
 
     - name: ユーザをsudoersに登録
       copy:
-        content: "kkano ALL=(ALL) NOPASSWD: ALL"
+        content: |
+          kkano ALL=(ALL) NOPASSWD: ALL
         dest: /etc/sudoers.d/kkano
         mode: '0440'
 
