@@ -18,6 +18,7 @@
           - DNS:gitea.daieihawks
           - DNS:mopidy.daieihawks
           - DNS:netdata.daieihawks
+          - DNS:memdump.daieihawks
           - IP:192.168.0.111
 
     - name: 証明書を自己署名
