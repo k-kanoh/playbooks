@@ -1,0 +1,47 @@
+- name: kkanoをclaude-memoryグループに追加
+  user:
+    name: kkano
+    groups: claude-memory
+    append: yes
+
+- name: AGENT_MEMORY_DIRを.bashrcに追加
+  lineinfile:
+    path: /home/kkano/.bashrc
+    regexp: '^export AGENT_MEMORY_DIR='
+    line: 'export AGENT_MEMORY_DIR=~claude-memory/.agent-memory'
+
+- name: kkanoの.claude/skillsディレクトリを作成
+  file:
+    path: /home/kkano/.claude/skills
+    state: directory
+    owner: kkano
+    group: kkano
+
+- name: CLAUDE.mdを配置
+  copy:
+    src: CLAUDE.md
+    dest: /home/kkano/.claude/CLAUDE.md
+    owner: kkano
+    group: kkano
+
+- name: settings.jsonを配置
+  copy:
+    src: settings.json
+    dest: /home/kkano/.claude/settings.json
+    owner: kkano
+    group: kkano
+
+- name: agent-memory skillのシンボリックリンクを作成
+  file:
+    src: /opt/agent-memory/skills/agent-memory/
+    dest: /home/kkano/.claude/skills/agent-memory
+    state: link
+    owner: kkano
+    group: kkano
+
+- name: commandsを配置
+  copy:
+    src: commands/
+    dest: /home/kkano/.claude/commands/
+    owner: kkano
+    group: kkano

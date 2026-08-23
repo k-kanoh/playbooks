@@ -1,0 +1,26 @@
+{
+  "theme": "dark",
+  "tui": "fullscreen",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mem-context-hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "out=\"\"; for d in $(find . -maxdepth 3 -name .git -type d 2>/dev/null); do repo=$(dirname \"$d\"); branch=$(git -C \"$repo\" branch --show-current 2>/dev/null); if [ -n \"$branch\" ]; then if [ -n \"$out\" ]; then out=\"$out; \"; fi; out=\"${out}${repo}: ${branch}\"; fi; done; if [ -n \"$out\" ]; then printf '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"Git branch status - %s\"}}' \"$out\"; else printf '{}'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

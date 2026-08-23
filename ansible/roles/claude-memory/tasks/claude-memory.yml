@@ -1,0 +1,46 @@
+- name: claude-memoryユーザーを追加
+  user:
+    name: claude-memory
+    shell: /bin/bash
+
+- name: 公開鍵の登録
+  authorized_key:
+    user: claude-memory
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG6TlpJLpEhM37Ek1zzTkAZ9PwBLN/jFe9F2x1/vmt9K claude-memory-windows"
+
+- name: agent-memory本体をclone
+  git:
+    repo: https://github.com/OctavianTocan/agent-memory.git
+    dest: /opt/agent-memory
+    update: yes
+
+- name: memコマンドを配置
+  copy:
+    src: mem
+    dest: /usr/local/bin/mem
+    mode: '0755'
+
+- name: mem-context-hookのシンボリックリンクを作成
+  file:
+    src: /opt/agent-memory/bin/mem-context-hook
+    dest: /usr/local/bin/mem-context-hook
+    state: link
+    force: yes
+
+- name: 共有データディレクトリを作成
+  file:
+    path: /home/claude-memory/.agent-memory
+    state: directory
+    group: claude-memory
+    mode: '2775'
+
+- name: claude-memoryユーザーの.claude/skillsディレクトリを作成
+  file:
+    path: /home/claude-memory/.claude/skills
+    state: directory
+
+- name: agent-memory skillのシンボリックリンクを作成
+  file:
+    src: /opt/agent-memory/skills/agent-memory/
+    dest: /home/claude-memory/.claude/skills/agent-memory
+    state: link
