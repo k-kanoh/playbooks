@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+NO_DESC_SUBCOMMANDS=(soul log search query embed init status export dump import reset update help)
+
+if [[ $# -ge 1 ]]; then
+    cmd="$1"
+    for nd in "${NO_DESC_SUBCOMMANDS[@]}"; do
+        if [[ "$cmd" == "$nd" ]]; then
+            for arg in "$@"; do
+                if [[ "$arg" == "--desc" ]]; then
+                    echo "Error: --desc is only valid for 'mem fact'. '$cmd' does not support it." >&2
+                    exit 1
+                fi
+            done
+            break
+        fi
+    done
+fi
+
+exec /opt/agent-memory/bin/mem "$@"

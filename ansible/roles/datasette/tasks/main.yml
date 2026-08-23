@@ -1,0 +1,17 @@
+- name: datasetteを導入
+  command: pipx install datasette
+  args:
+    creates: /home/claude-memory/.local/bin/datasette
+  become_user: claude-memory
+
+- name: datasette-agent-memoryのunitを配置
+  copy:
+    src: datasette-agent-memory.service
+    dest: /etc/systemd/system/datasette-agent-memory.service
+
+- name: datasette-agent-memoryサービスを有効化・起動
+  systemd:
+    name: datasette-agent-memory
+    daemon_reload: yes
+    enabled: yes
+    state: started

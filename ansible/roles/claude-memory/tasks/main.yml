@@ -1,0 +1,2 @@
+- import_tasks: claude-memory.yml
+- import_tasks: kkano.yml

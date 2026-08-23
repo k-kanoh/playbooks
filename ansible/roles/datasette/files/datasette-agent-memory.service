@@ -1,0 +1,11 @@
+[Unit]
+Description=Datasette viewer for agent-memory (memory.db)
+
+[Service]
+Type=simple
+User=claude-memory
+ExecStart=/home/claude-memory/.local/bin/datasette /home/claude-memory/.agent-memory/memory.db -p 33336 --setting truncate_cells_html 0
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
